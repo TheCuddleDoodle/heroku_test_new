@@ -1,26 +1,12 @@
-const http = require('http');
-const { Client } = require('pg');
-console.log("print")
-const PORT = process.env.PORT || 5000;
-const { DATABASE_URL } = process.env;
-const server = http.createServer((req, res) => {
-  const client = new Client({
-    connectionString: DATABASE_URL,
+const { create, Client } = require('@open-wa/wa-automate');
+const ud = require('urban-dictionary')
+
+function start(client) {
+  client.onMessage(async message => {
+    if (message.body === 'Hi') {
+		await client.sendText(message.from, "Hello World");
+    	}
   });
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  client.connect()
-    .then(() => client.query('SELECT * FROM hellotable'))
-    .then((result) => {
-      res.end(`${result.rows[0].name}\n`);
-      client.end();
-    })
-    .catch(() => {
-      res.end('ERROR');
-      client.end();
-    });
-});
-server.listen(PORT, () => {
-  // eslint-disable-next-line
-  console.log(`Server running on ${PORT}/`);
-});
+}
+
+create().then(start);
